@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Map - CoastGuard AI</title>
+    <!-- INLINE DEVICE CHECK - Redirect desktop users to desktop map -->
+    <script>
+        (function() {
+            const isMobileUA = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile|touch/i.test(navigator.userAgent.toLowerCase());
+            const isSmallViewport = window.innerWidth <= 768;
+            const isIPad = navigator.userAgent.includes('iPad');
+            const isMobile = (isMobileUA && !isIPad) || (isSmallViewport && !isIPad);
+
+            // If NOT mobile, redirect to desktop map
+            if (!isMobile) {
+                window.location.href = '/map';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f8fb;
+            color: #1a3a4a;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .mobile-header {
+            background: white;
+            padding: 12px 15px;
+            border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #00d9ff 0%, #10b981 100%);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0a2e4a;
+            flex: 1;
+            text-align: center;
+        }
+
+        .map-container {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: calc(100vh - 50px);
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .info-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 16px 16px 0 0;
+            max-height: 40vh;
+            overflow-y: auto;
+            z-index: 500;
+            padding: 15px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .panel-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0a2e4a;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-stat {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(181, 0, 255, 0.05) 100%);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00d9ff;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .info-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .info-label {
+            color: #888;
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: #0a2e4a;
+            font-weight: 700;
+        }
+
+        .default-message {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+            font-size: 13px;
+        }
+
+        @media (min-width: 769px) {
+            body::before {
+                content: 'Mobile optimized version';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                font-size: 18px;
+                color: #666;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="mobile-header">
+        <a href="/mobile-dashboard" class="back-btn">← Dashboard</a>
+        <div class="header-title">🗺️ Live Map</div>
+        <div style="width: 50px;"></div>
+    </div>
+
+    <!-- Map -->
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="info-panel">
+        <div class="panel-header">
+            <div class="panel-title">Zone Information</div>
+        </div>
+
+        <div id="infoContent">
+            <div class="default-message">👆 Tap on zone markers or drones to view details</div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="/static/mobile-map.js"></script>
+</body>
+</html>

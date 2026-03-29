@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CoastGuard AI</title>
+    <!-- INLINE DEVICE CHECK - Redirect desktop users to desktop login -->
+    <script>
+        (function() {
+            const isMobileUA = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile|touch/i.test(navigator.userAgent.toLowerCase());
+            const isSmallViewport = window.innerWidth <= 768;
+            const isIPad = navigator.userAgent.includes('iPad');
+            const isMobile = (isMobileUA && !isIPad) || (isSmallViewport && !isIPad);
+
+            // If NOT mobile, redirect to desktop login
+            if (!isMobile) {
+                window.location.href = '/login';
+            }
+        })();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a2e4a 0%, #1e5a7a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 12px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-link:active {
+            background: rgba(0, 217, 255, 0.2);
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0a2e4a 0%, #00d9ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input {
+            padding: 14px 16px;
+            border: 2px solid rgba(0, 217, 255, 0.2);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            background: rgba(240, 248, 251, 0.8);
+            color: #1a3a4a;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00d9ff;
+            background: rgba(240, 248, 251, 1);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        input::placeholder {
+            color: #aaa;
+        }
+
+        button {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #00d9ff 0%, #10b981 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .signup-link {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #00d9ff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        @media (min-width: 769px) {
+            body::before {
+                content: 'Mobile optimized version';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                font-size: 18px;
+                color: #666;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Back</a>
+
+    <div class="auth-container">
+        <div class="brand">🌊 CoastGuard</div>
+        <div class="subtitle">Welcome Back</div>
+
+        {% if error %}
+        <div style="background: rgba(220, 38, 38, 0.2); color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 12px; border-left: 3px solid #dc2626;">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <input type="text" name="login" placeholder="Username or Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="signup-link">
+            Don't have an account? <a href="/mobile-signup">Sign Up</a>
+        </div>
+    </div>
+</body>
+</html>

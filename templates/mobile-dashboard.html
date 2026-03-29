@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoastGuard AI - Dashboard</title>
+    <!-- INLINE DEVICE CHECK - Redirect desktop users to desktop dashboard -->
+    <script>
+        (function() {
+            const isMobileUA = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile|touch/i.test(navigator.userAgent.toLowerCase());
+            const isSmallViewport = window.innerWidth <= 768;
+            const isIPad = navigator.userAgent.includes('iPad');
+            const isMobile = (isMobileUA && !isIPad) || (isSmallViewport && !isIPad);
+
+            // If NOT mobile, redirect to desktop dashboard
+            if (!isMobile) {
+                window.location.href = '/dashboard';
+            }
+        })();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f8fb;
+            color: #1a3a4a;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        .mobile-header {
+            background: linear-gradient(135deg, #0a2e4a 0%, #1e5a7a 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-header-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu-btn:active {
+            background: rgba(0, 217, 255, 0.3);
+        }
+
+        /* ===== MOBILE DRAWER MENU ===== */
+        .mobile-drawer {
+            position: fixed;
+            left: -100%;
+            top: 0;
+            width: 75%;
+            max-width: 280px;
+            height: 100vh;
+            background: #0a2e4a;
+            color: white;
+            z-index: 999;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding-top: 20px;
+        }
+
+        .mobile-drawer.active {
+            left: 0;
+        }
+
+        .drawer-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .drawer-brand {
+            padding: 20px 15px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #00d9ff;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+            margin-top: 30px;
+        }
+
+        .drawer-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .drawer-item {
+            padding: 15px 20px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            text-align: left;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .drawer-item:active {
+            background: rgba(0, 217, 255, 0.1);
+            border-left-color: #00d9ff;
+        }
+
+        .drawer-logout {
+            margin-top: auto;
+            padding: 20px;
+            border-top: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00d9ff, #10b981);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* ===== CONTENT ===== */
+        .mobile-content {
+            padding: 15px;
+            padding-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0a2e4a;
+            margin: 20px 0 15px 0;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #00d9ff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0a2e4a;
+        }
+
+        .stat-unit {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+
+        /* ===== CHART CONTAINER ===== */
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0a2e4a;
+            margin-bottom: 15px;
+        }
+
+        .chart-placeholder {
+            background: linear-gradient(135deg, #e0f4ff 0%, #f0f8fb 100%);
+            padding: 40px 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: #0a2e4a;
+            font-size: 13px;
+        }
+
+        /* ===== DRONE CARD ===== */
+        .drone-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .drone-item {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-top: 3px solid #00d9ff;
+        }
+
+        .drone-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0a2e4a;
+            margin-bottom: 6px;
+        }
+
+        .drone-area {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* ===== BUTTONS ===== */
+        .action-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00d9ff 0%, #10b981 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .action-button:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 769px) {
+            /* Redirect desktop users */
+            body::before {
+                content: 'This is a mobile-optimized version. Please use desktop version.';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                font-size: 18px;
+                color: #666;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="mobile-header">
+        <span class="mobile-header-title">🤖 CoastGuard Dashboard</span>
+        <button class="mobile-menu-btn" id="menuBtn">☰</button>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div class="mobile-drawer" id="drawer">
+        <button class="drawer-close" id="closeBtn">✕</button>
+        <div class="drawer-brand">🌊 CoastGuard</div>
+        <div class="drawer-menu">
+            <button class="drawer-item" onclick="switchView('dashboard')">📊 Dashboard</button>
+            <button class="drawer-item" onclick="switchView('analytics')">📈 Analytics</button>
+            <button class="drawer-item" onclick="switchView('drones')">🚁 Drone Fleet</button>
+            <button class="drawer-item" onclick="navigateTo('/map')">🗺️ Live Map</button>
+        </div>
+        <div class="drawer-logout">
+            <form action="/logout" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="mobile-content">
+        <!-- Dashboard View -->
+        <div id="dashboard-view">
+            <h2 style="font-size: 18px; color: #0a2e4a; margin-bottom: 20px;">Welcome Back! 👋</h2>
+
+            <div class="section-title">System Status</div>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-label">💰 Donations</div>
+                    <div class="stat-value" id="stat-donations">0</div>
+                    <div class="stat-unit">USD</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🔵 Active Pods</div>
+                    <div class="stat-value" id="stat-pods">0</div>
+                    <div class="stat-unit">units</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">📍 Area Scanned</div>
+                    <div class="stat-value" id="stat-area">0</div>
+                    <div class="stat-unit">km²</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">✈️ Drones Online</div>
+                    <div class="stat-value" id="stat-drones">0</div>
+                    <div class="stat-unit">active</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Overview</div>
+                <div class="chart-placeholder">
+                    Real-time monitoring of UAE's coastal restoration zones. Tap menu to explore more details!
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics View -->
+        <div id="analytics-view" style="display: none;">
+            <h2 style="font-size: 18px; color: #0a2e4a; margin-bottom: 20px;">📈 Analytics & Trends</h2>
+
+            <div class="section-title">Pods Over Time (Last 7 Days)</div>
+            <div class="chart-card">
+                <div class="chart-placeholder">Chart data loading...</div>
+            </div>
+
+            <div class="section-title">Area Scanned by Drone</div>
+            <div class="chart-card">
+                <div class="chart-placeholder">Chart data loading...</div>
+            </div>
+        </div>
+
+        <!-- Drones View -->
+        <div id="drones-view" style="display: none;">
+            <h2 style="font-size: 18px; color: #0a2e4a; margin-bottom: 20px;">🚁 Active Drone Fleet</h2>
+
+            <div class="section-title">Current Drones</div>
+            <div class="drone-container" id="droneList">
+                <div class="drone-item">
+                    <div class="drone-name">Drone 1</div>
+                    <div class="drone-area">Loading...</div>
+                </div>
+                <div class="drone-item">
+                    <div class="drone-name">Drone 2</div>
+                    <div class="drone-area">Loading...</div>
+                </div>
+                <div class="drone-item">
+                    <div class="drone-name">Drone 3</div>
+                    <div class="drone-area">Loading...</div>
+                </div>
+                <div class="drone-item">
+                    <div class="drone-name">Drone 4</div>
+                    <div class="drone-area">Loading...</div>
+                </div>
+                <div class="drone-item">
+                    <div class="drone-name">Drone 5</div>
+                    <div class="drone-area">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menu Toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const drawer = document.getElementById('drawer');
+        const overlay = document.getElementById('overlay');
+
+        menuBtn.addEventListener('click', () => {
+            drawer.classList.add('active');
+            overlay.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', closeMenu);
+        overlay.addEventListener('click', closeMenu);
+
+        function closeMenu() {
+            drawer.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        // Close menu when clicking items
+        document.querySelectorAll('.drawer-item').forEach(item => {
+            item.addEventListener('click', closeMenu);
+        });
+
+        // View Switching
+        function switchView(view) {
+            document.querySelectorAll('[id$="-view"]').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById(view + '-view').style.display = 'block';
+        }
+
+        function navigateTo(path) {
+            window.location.href = path;
+        }
+
+        // Load mock data
+        function loadData() {
+            document.getElementById('stat-donations').textContent = '45,230';
+            document.getElementById('stat-pods').textContent = '12';
+            document.getElementById('stat-area').textContent = '245';
+            document.getElementById('stat-drones').textContent = '5';
+        }
+
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

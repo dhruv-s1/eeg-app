@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to CoastGuard - Getting Started</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .onboarding-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--ocean-dark) 0%, var(--ocean-blue) 100%);
+        }
+
+        .onboarding-modal {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+            animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .onboarding-header {
+            background: linear-gradient(135deg, var(--ocean-dark) 0%, var(--teal-dark) 100%);
+            padding: 40px 30px;
+            color: white;
+            position: relative;
+        }
+
+        .onboarding-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .onboarding-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            width: 100%;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--teal-primary);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 14.28%;
+        }
+
+        .onboarding-content {
+            padding: 50px 40px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .step {
+            display: none;
+            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .step-icon {
+            font-size: 60px;
+            margin-bottom: 25px;
+        }
+
+        .step h3 {
+            font-size: 24px;
+            color: var(--ocean-dark);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .step p {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .step ul {
+            text-align: left;
+            display: inline-block;
+            font-size: 14px;
+            color: #555;
+            line-height: 2;
+        }
+
+        .step ul li {
+            margin-bottom: 8px;
+        }
+
+        .step ul li strong {
+            color: var(--teal-primary);
+            font-weight: 700;
+        }
+
+        .step-indicator {
+            font-size: 13px;
+            color: #aaa;
+            margin-top: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .onboarding-footer {
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(240, 248, 251, 0.4);
+        }
+
+        .step-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            padding: 11px 24px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            background: white;
+            color: var(--ocean-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: var(--teal-primary);
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            padding: 11px 28px;
+            background: linear-gradient(135deg, var(--teal-primary) 0%, var(--neon-cyan) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .skip-tour {
+            font-size: 12px;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+
+        .skip-tour:hover {
+            color: var(--ocean-dark);
+        }
+
+        @media (max-width: 600px) {
+            .onboarding-modal {
+                border-radius: 12px;
+            }
+
+            .onboarding-header {
+                padding: 30px 20px;
+            }
+
+            .onboarding-header h2 {
+                font-size: 22px;
+            }
+
+            .onboarding-content {
+                padding: 40px 25px;
+                min-height: 280px;
+            }
+
+            .step h3 {
+                font-size: 20px;
+            }
+
+            .onboarding-footer {
+                padding: 20px 25px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .step-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .skip-tour {
+                align-self: flex-start;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .onboarding-header {
+                padding: 25px 15px;
+            }
+
+            .onboarding-header h2 {
+                font-size: 20px;
+            }
+
+            .onboarding-content {
+                padding: 30px 15px;
+            }
+
+            .step-icon {
+                font-size: 48px;
+            }
+
+            .step h3 {
+                font-size: 18px;
+            }
+
+            .onboarding-footer {
+                padding: 15px;
+            }
+
+            .btn-secondary, .btn-primary {
+                padding: 10px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="onboarding-modal">
+            <!-- Header with Progress -->
+            <div class="onboarding-header">
+                <h2 id="stepTitle">Welcome to CoastGuard</h2>
+                <p id="stepSubtitle">Let's explore the dashboard</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="onboarding-content">
+                <!-- Step 1: Welcome -->
+                <div class="step active">
+                    <div class="step-icon">🌊</div>
+                    <h3>Welcome to CoastGuard AI</h3>
+                    <p>Advanced coastal monitoring and restoration tracking system</p>
+                    <p style="font-size: 14px; color: #999;">This quick tour will show you all features and help you get started</p>
+                    <div class="step-indicator">Step 1 of 7</div>
+                </div>
+
+                <!-- Step 2: Dashboard -->
+                <div class="step">
+                    <div class="step-icon">📊</div>
+                    <h3>Dashboard Overview</h3>
+                    <p>Your central hub for monitoring coastal restoration</p>
+                    <ul>
+                        <li><strong>💰 Stats Cards</strong> - Real-time monitoring data</li>
+                        <li><strong>📈 Analytics Tab</strong> - View trends and patterns</li>
+                        <li><strong>🚁 Drone Fleet</strong> - Active drones status</li>
+                        <li><strong>🗺️ Live Map</strong> - Aerial monitoring</li>
+                    </ul>
+                    <div class="step-indicator">Step 2 of 7</div>
+                </div>
+
+                <!-- Step 3: Analytics -->
+                <div class="step">
+                    <div class="step-icon">📈</div>
+                    <h3>Analytics & Trends</h3>
+                    <p>Track performance metrics over time</p>
+                    <ul>
+                        <li>View pod activity across days</li>
+                        <li>Monitor area coverage by drone</li>
+                        <li>Analyze coastal restoration progress</li>
+                        <li>Export data for reports</li>
+                    </ul>
+                    <div class="step-indicator">Step 3 of 7</div>
+                </div>
+
+                <!-- Step 4: Drone Fleet -->
+                <div class="step">
+                    <div class="step-icon">🚁</div>
+                    <h3>Active Drone Fleet</h3>
+                    <p>Monitor all drones in real-time</p>
+                    <ul>
+                        <li>5 active drones on patrol</li>
+                        <li>Coverage area and status info</li>
+                        <li>Battery and altitude monitoring</li>
+                        <li>Click on drone cards for details</li>
+                    </ul>
+                    <div class="step-indicator">Step 4 of 7</div>
+                </div>
+
+                <!-- Step 5: Live Map -->
+                <div class="step">
+                    <div class="step-icon">🗺️</div>
+                    <h3>Live Coastal Monitoring Map</h3>
+                    <p>Real-time aerial view of restoration zones</p>
+                    <ul>
+                        <li>View all coastal zones on map</li>
+                        <li>Watch drones in real-time flight</li>
+                        <li>See risk levels and status</li>
+                        <li>Get recommendations by zone</li>
+                    </ul>
+                    <div class="step-indicator">Step 5 of 7</div>
+                </div>
+
+                <!-- Step 6: Navigation Sidebar -->
+                <div class="step">
+                    <div class="step-icon">⚙️</div>
+                    <h3>Sidebar Navigation</h3>
+                    <p>Quick access to all features</p>
+                    <ul>
+                        <li><strong>📊 Dashboard</strong> - Main overview</li>
+                        <li><strong>📈 Analytics</strong> - Charts and data</li>
+                        <li><strong>🚁 Drone Fleet</strong> - Active units</li>
+                        <li><strong>🗺️ Live Map</strong> - Real-time tracking</li>
+                        <li><strong>Logout</strong> - Sign out when done</li>
+                    </ul>
+                    <div class="step-indicator">Step 6 of 7</div>
+                </div>
+
+                <!-- Step 7: Complete -->
+                <div class="step">
+                    <div class="step-icon">✅</div>
+                    <h3>You're All Set!</h3>
+                    <p>Ready to start monitoring coastal restoration</p>
+                    <p style="font-size: 14px; color: #999;">Click "Complete Tour" to access the dashboard and start exploring</p>
+                    <div class="step-indicator">Step 7 of 7</div>
+                </div>
+            </div>
+
+            <!-- Footer with Controls -->
+            <div class="onboarding-footer">
+                <span class="skip-tour" onclick="skipTour()">Skip Tour</span>
+                <div class="step-controls">
+                    <button class="btn-secondary" id="prevBtn" onclick="previousStep()" disabled>← Previous</button>
+                    <button class="btn-primary" id="nextBtn" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/onboarding.js"></script>
+</body>
+</html>

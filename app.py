@@ -78,7 +78,7 @@ def migrate_database():
 
 @app.route('/')
 def home():
-    return render_template('landing.html')
+    return render_template('mobile-landing.html')
 
 @app.route('/mobile-landing')
 def mobile_landing():
@@ -94,25 +94,25 @@ def signup():
         # Validate username
         username_valid, username_msg = validate_username(username)
         if not username_valid:
-            return render_template('signup.html', error=username_msg)
+            return render_template('mobile-signup.html', error=username_msg)
 
         # Validate email
         email_valid, email_msg = validate_email(email)
         if not email_valid:
-            return render_template('signup.html', error=email_msg)
+            return render_template('mobile-signup.html', error=email_msg)
 
         # Validate password
         password_valid, password_msg = validate_password(password)
         if not password_valid:
-            return render_template('signup.html', error=password_msg)
+            return render_template('mobile-signup.html', error=password_msg)
 
         # Check if username already exists
         if User.query.filter_by(username=username).first():
-            return render_template('signup.html', error='Username already exists')
+            return render_template('mobile-signup.html', error='Username already exists')
 
         # Check if email already exists
         if User.query.filter_by(email=email).first():
-            return render_template('signup.html', error='Email already registered')
+            return render_template('mobile-signup.html', error='Email already registered')
 
         # Create new user
         hashed_password = generate_password_hash(password)
@@ -122,7 +122,7 @@ def signup():
 
         return redirect('/login')
 
-    return render_template('signup.html')
+    return render_template('mobile-signup.html')
 
 @app.route('/mobile-signup', methods=['GET','POST'])
 def mobile_signup():
@@ -180,9 +180,9 @@ def login():
             return redirect('/dashboard')
 
         # Show error for invalid credentials
-        return render_template('login.html', error='Invalid username/email or password')
+        return render_template('mobile-login.html', error='Invalid username/email or password')
 
-    return render_template('login.html')
+    return render_template('mobile-login.html')
 
 @app.route('/mobile-login', methods=['GET','POST'])
 def mobile_login():
@@ -208,7 +208,7 @@ def mobile_login():
 @login_required
 def dashboard():
     onboarding_needed = 'true' if not current_user.onboarding_complete else 'false'
-    return render_template('dashboard.html', onboarding_needed=onboarding_needed)
+    return render_template('mobile-dashboard.html', onboarding_needed=onboarding_needed)
 
 @app.route('/mobile-dashboard')
 @login_required
@@ -349,5 +349,4 @@ def logout():
 
 if __name__ == '__main__':
     migrate_database()
-    port = int(os.environ.get("PORT", 10000))  # Render sets PORT automatically
-    app.run(debug=False, host="0.0.0.0", port=port)
+    app.run(debug=False, host="0.0.0.0", port=5001)
